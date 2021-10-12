@@ -14,6 +14,7 @@ export const Bridge = () => {
     addr: "",
   });
 
+  const [listChange, setListChange] = useState([] as string[]);
 
   const [list1, setList1] = useState([] as ListElement[]);
 
@@ -59,6 +60,7 @@ export const Bridge = () => {
     const target = (event.currentTarget.elements[1] as HTMLFormElement).value;
     console.log(source);
 
+    const listChangeNew = [];
     for (const way in netDict) {
       if (way == source) {
         const singleNetDict = netDict[way];
@@ -72,10 +74,11 @@ export const Bridge = () => {
                   source: source,
                   port: obj[key1],
                 }]);
+                listChangeNew.push("B1");
               }
 
               const index2 = list1.findIndex((value => value.source == target));
-              if (index2 != -1) {
+              if (index2 != -1 && list1[index2].port === obj[key1]) {
                 setMessage1("B1丢弃该帧");
                 break;
               } else {
@@ -90,10 +93,11 @@ export const Bridge = () => {
                   source: source,
                   port: obj[key1],
                 }]);
+                listChangeNew.push("B2");
               }
 
               const index2 = list2.findIndex((value => value.source == target));
-              if (index2 != -1) {
+              if (index2 != -1 && list2[index2].port == obj[key1]) {
                 setMessage2("B2丢弃该帧");
                 break;
               } else {
@@ -110,6 +114,23 @@ export const Bridge = () => {
 
 
     }
+    setListChange(listChangeNew);
+  };
+
+  const rollBack = () => {
+    const param = listChange;
+    console.log(param);
+    if (param.includes("B1")) {
+      const copy = [...list1];
+      copy.splice(list1.length - 1, 1);
+      setList1(copy);
+    }
+    if (param.includes("B2")) {
+      const copy = [...list2];
+      copy.splice(list2.length - 1, 1);
+      setList2(copy);
+    }
+    setListChange([]);
   };
 
   return (
@@ -122,6 +143,9 @@ export const Bridge = () => {
           <SearchForm computers={computerList} param={target} setParam={setTarget}/>
           <button type={"submit"}>开始</button>
         </form>
+        <div style={{ textAlign: "center" }}>
+          <button onClick={rollBack}>后退</button>
+        </div>
 
       </div>
 
