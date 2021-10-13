@@ -10,6 +10,7 @@ export const cleanObject = (object: any) => {
     }
   });
   return result;
+
 };
 
 
